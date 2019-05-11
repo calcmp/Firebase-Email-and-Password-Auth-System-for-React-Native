@@ -1,5 +1,9 @@
 import React, { Component } from "react";
-import { createStackNavigator, createAppContainer } from "react-navigation";
+import {
+  createStackNavigator,
+  createAppContainer,
+  createSwitchNavigator
+} from "react-navigation";
 
 import AuthScreen from "./src/Screens/Auth/AuthScreen";
 import AccountScreen from "./src/Screens/Account/AccountScreen";
@@ -13,13 +17,20 @@ class App extends React.Component {
   }
 }
 
-const AppStackNav = createStackNavigator({
+const AppSwitchNav = createSwitchNavigator({
   LoadingScreen: LoadingScreen,
   AuthScreen: AuthScreen,
-  AccountScreen: AccountScreen,
-  EditScreen: EditScreen,
-  ReAuthScreen: ReAuthScreen
+  AccountScreen: AccountScreen
 });
+
+const AppStackNav = createStackNavigator(
+  {
+    Loaded: AppSwitchNav,
+    EditScreen: EditScreen,
+    ReAuthScreen: ReAuthScreen
+  },
+  { defaultNavigationOptions: { title: "BandApp", headerLeft: null } }
+);
 
 const AppNavigator = createAppContainer(AppStackNav);
 

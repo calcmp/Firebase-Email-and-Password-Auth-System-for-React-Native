@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View, ActivityIndicator } from "react-native";
+import { StyleSheet, View, ActivityIndicator, Alert } from "react-native";
 
 import firebase from "../../../firebase";
 import Input from "../../Components/Input/Input";
@@ -12,62 +12,72 @@ class AuthScreen extends Component {
     lastName: "",
     email: "",
     password: "",
+    confirmPass: "",
     newUser: false,
     signingIn: false
-  };
-
-  /*
-   * Validate email input string
-   */
-  validateEmail = text => {
-    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (reg.test(text) === false) {
-      console.log("Email is not correct");
-      this.setState({ email: text });
-      return false;
-    }
-    this.setState({ email: text });
-    console.log("Email is correct");
   };
 
   /*
    * On sign in > navigate to account screen
    */
   onPressSignIn = () => {
-    this.setState({ signingIn: true });
-    console.log(this.state.email);
     firebase
       .auth()
       .signInWithEmailAndPassword(this.state.email, this.state.password)
       .then(() => {
+        // Set signingIn true to display loading icon
+        this.setState({ signingIn: true });
         this.props.navigation.navigate("AccountScreen");
       })
-      .catch(function(error) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log("Error Code:", errorCode, "\nMessage:", errorMessage);
+      .catch(() => {
+        Alert.alert("Error", "Incorrect email and/or password.", [
+          { text: "Retry" }
+        ]);
       });
   };
 
   /*
+   * Check if firstName and lastName not empty string
+   * Check if passwords match and > 6 characters
    * Create account, update display name, update user in database
    * Navigate to account screen
    */
   onPressCreateAccount = () => {
-    this.setState({ signingIn: true });
-    console.log(this.state.email);
+    // Check if firstName and lastName exist
+    if (this.state.firstName === "") {
+      return Alert.alert("Error", "Enter your first name.", [
+        { text: "Retry" }
+      ]);
+    }
+    if (this.state.lastName === "") {
+      return Alert.alert("Error", "Enter your last name.", [{ text: "Retry" }]);
+    }
+
+    // Check if passwords match
+    if (this.state.password !== this.state.confirmPass) {
+      return Alert.alert("Mismatch", "Passwords do not match.", [
+        { text: "Retry" },
+        { cancelable: false }
+      ]);
+    }
+    if (this.state.password.length < 6) {
+      return Alert.alert("Error", "Passwords must be at least 6 characters.", [
+        { text: "Retry" },
+        { cancelable: false }
+      ]);
+    }
     firebase
       .auth()
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then(() => {
+        // Set signingIn true to display loading icon
+        this.setState({ signingIn: true });
+
         // Update profile display name
         firebase
           .auth()
           .currentUser.updateProfile({
             displayName: this.state.firstName + " " + this.state.lastName
-          })
-          .then(function() {
-            console.log("Display name updated");
           })
           .then(() => {
             // Update user in database
@@ -87,14 +97,12 @@ class AuthScreen extends Component {
             // Once account create > navigate to account screen
             this.props.navigation.navigate("AccountScreen");
           })
-          .catch(function(error) {
+          .catch(error => {
             console.error(error);
           });
       })
-      .catch(function(error) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log("Error Code:", errorCode, "\nMessage:", errorMessage);
+      .catch(() => {
+        Alert.alert("Error", "Invalid email address.", [{ text: "Retry" }]);
       });
   };
 
@@ -109,8 +117,11 @@ class AuthScreen extends Component {
                 <Input
                   label="Email"
                   placeholder="Enter your email address..."
-                  onChangeText={text => this.validateEmail(text)}
+                  onChangeText={email =>
+                    this.setState({ email: email.replace(/\s/g, "") })
+                  }
                   value={this.state.email}
+                  keyboardType="email-address"
                 />
                 <Input
                   label="Password"
@@ -119,6 +130,7 @@ class AuthScreen extends Component {
                   onChangeText={password => this.setState({ password })}
                   value={this.state.password}
                 />
+
                 <Button onPress={() => this.onPressSignIn()}>Log In</Button>
                 <Button onPress={() => this.setState({ newUser: true })}>
                   Create Account
@@ -130,20 +142,27 @@ class AuthScreen extends Component {
                 <Input
                   label="First Name"
                   placeholder="Enter first name..."
-                  onChangeText={firstName => this.setState({ firstName })}
+                  onChangeText={firstName =>
+                    this.setState({ firstName: firstName.replace(/\s/g, "") })
+                  }
                   value={this.state.firstName}
                 />
                 <Input
                   label="Last Name"
                   placeholder="Enter your last name..."
-                  onChangeText={lastName => this.setState({ lastName })}
+                  onChangeText={lastName =>
+                    this.setState({ lastName: lastName.replace(/\s/g, "") })
+                  }
                   value={this.state.lastName}
                 />
                 <Input
                   label="Email"
                   placeholder="Enter your email address..."
-                  onChangeText={text => this.validateEmail(text)}
+                  onChangeText={email =>
+                    this.setState({ email: email.replace(/\s/g, "") })
+                  }
                   value={this.state.email}
+                  keyboardType="email-address"
                 />
                 <Input
                   label="Password"
@@ -151,6 +170,13 @@ class AuthScreen extends Component {
                   secureTextEntry
                   onChangeText={password => this.setState({ password })}
                   value={this.state.password}
+                />
+                <Input
+                  label="Confirm Password"
+                  placeholder="Confirm your password..."
+                  secureTextEntry
+                  onChangeText={confirmPass => this.setState({ confirmPass })}
+                  value={this.state.confirmPass}
                 />
                 <Button onPress={() => this.onPressCreateAccount()}>
                   Sign Up

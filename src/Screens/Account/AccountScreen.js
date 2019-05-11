@@ -29,7 +29,6 @@ class AccountScreen extends Component {
    */
   componentDidMount() {
     const userId = firebase.auth().currentUser.uid;
-    console.log(firebase.auth().currentUser);
     firebase
       .firestore()
       .collection("users")
@@ -47,7 +46,7 @@ class AccountScreen extends Component {
           console.log("No such document!");
         }
       })
-      .catch(function(error) {
+      .catch(error => {
         console.log("Error getting document:", error);
       });
   }
@@ -60,10 +59,10 @@ class AccountScreen extends Component {
     firebase
       .auth()
       .signOut()
-      .then(function() {
+      .then(() => {
         console.log("Signed out");
       })
-      .catch(function(error) {
+      .catch(error => {
         console.log("Error: ", error);
       });
   };

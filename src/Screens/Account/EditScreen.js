@@ -46,7 +46,7 @@ class EditScreen extends Component {
           console.log("No such document!");
         }
       })
-      .catch(function(error) {
+      .catch(error => {
         console.log("Error getting document:", error);
       });
   }
@@ -63,13 +63,13 @@ class EditScreen extends Component {
     // Check if first name and last name are empty
     if (this.state.firstName === "") {
       return Alert.alert("Error", "Enter your first name.", [
-        { text: "Retry", onPress: () => console.log("Retry Pressed") },
+        { text: "Retry" },
         { cancelable: false }
       ]);
     }
     if (this.state.lastName === "") {
       return Alert.alert("Error", "Enter your last name.", [
-        { text: "Retry", onPress: () => console.log("Retry Pressed") },
+        { text: "Retry" },
         { cancelable: false }
       ]);
     }
@@ -81,9 +81,8 @@ class EditScreen extends Component {
         displayName: this.state.firstName + " " + this.state.lastName
       })
       .then(() => {
-        console.log("Name Updated!");
         Alert.alert("Success", "Name updated!", [
-          { text: "Ok", onPress: () => console.log("Ok Pressed") },
+          { text: "Ok" },
           { cancelable: false }
         ]);
       })
@@ -125,9 +124,8 @@ class EditScreen extends Component {
       .auth()
       .currentUser.updateEmail(this.state.email)
       .then(() => {
-        console.log("Email updated");
         Alert.alert("Success", "Email updated!", [
-          { text: "Ok", onPress: () => console.log("Ok Pressed") },
+          { text: "Ok" },
           { cancelable: false }
         ]);
       })
@@ -156,28 +154,13 @@ class EditScreen extends Component {
    * Update login password
    */
   updatePassword = () => {
-    // Check if passwords match
-    if (this.state.password !== this.state.confirmPass) {
-      return Alert.alert("Mismatch", "Passwords do not match.", [
-        { text: "Retry", onPress: () => console.log("Retry Pressed") },
-        { cancelable: false }
-      ]);
-    }
-    if (this.state.password.length < 6) {
-      return Alert.alert("Error", "Passwords must be at least 6 characters.", [
-        { text: "Retry", onPress: () => console.log("Retry Pressed") },
-        { cancelable: false }
-      ]);
-    }
-
     // Update password
     firebase
       .auth()
       .currentUser.updatePassword(this.state.password)
       .then(() => {
-        console.log("Password updated");
         Alert.alert("Success", "Password updated!", [
-          { text: "Ok", onPress: () => console.log("Ok Pressed") },
+          { text: "Ok" },
           { cancelable: false }
         ]);
       })
@@ -201,7 +184,6 @@ class EditScreen extends Component {
       },
       {
         text: "Cancel",
-        onPress: () => console.log("Cancel Pressed"),
         style: "cancel"
       },
       { cancelable: false }
@@ -217,7 +199,7 @@ class EditScreen extends Component {
       .currentUser.delete()
       .then(() => {
         Alert.alert("Success", "Account deleted.", [
-          { text: "Ok", onPress: () => console.log("Ok Pressed") },
+          { text: "Ok" },
           { cancelable: false }
         ]);
         console.log("User Deleted");
@@ -255,21 +237,28 @@ class EditScreen extends Component {
               <Input
                 label="First Name"
                 placeholder={this.state.firstName}
-                onChangeText={firstName => this.setState({ firstName })}
+                onChangeText={firstName =>
+                  this.setState({ firstName: firstName.replace(/\s/g, "") })
+                }
                 value={this.state.firstName}
               />
               <Input
                 label="Last Name"
                 placeholder={this.state.lastName}
-                onChangeText={lastName => this.setState({ lastName })}
+                onChangeText={lastName =>
+                  this.setState({ lastName: lastName.replace(/\s/g, "") })
+                }
                 value={this.state.lastName}
               />
               <Button onPress={this.updateName}>Update Name</Button>
               <Input
                 label="Email"
                 placeholder={this.state.email}
-                onChangeText={email => this.setState({ email })}
+                onChangeText={email =>
+                  this.setState({ email: email.replace(/\s/g, "") })
+                }
                 value={this.state.email}
+                keyboardType="email-address"
               />
               <Button onPress={this.authEmail}>Update Email</Button>
               <Input
@@ -300,8 +289,6 @@ class EditScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderColor: "black",
-    borderWidth: 1,
     padding: 20,
     alignItems: "center",
     justifyContent: "center",

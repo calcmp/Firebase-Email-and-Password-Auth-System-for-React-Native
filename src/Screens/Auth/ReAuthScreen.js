@@ -25,15 +25,13 @@ class ReAuthScreen extends Component {
       .reauthenticateWithCredential(credential)
       .then(() => {
         // User re-authenticated.
-        console.log("inside reauth acc");
         this.props.navigation.state.params.onGoBack();
         this.props.navigation.goBack();
       })
       .catch(error => {
         // An error happened.
-        console.log(error);
         Alert.alert("Error", "Incorrect password.", [
-          { text: "Retry", onPress: () => console.log("Retry Pressed") },
+          { text: "Retry" },
           { cancelable: false }
         ]);
       });
