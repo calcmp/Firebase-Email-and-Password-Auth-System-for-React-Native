@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "band-app",
-    "slug": "band-app",
+    "name": "firebase-auth",
+    "slug": "firebase-auth",
     "privacy": "public",
     "sdkVersion": "32.0.0",
     "platforms": [
