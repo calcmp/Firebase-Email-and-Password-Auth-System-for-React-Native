@@ -28,7 +28,7 @@ class ReAuthScreen extends Component {
         this.props.navigation.state.params.onGoBack();
         this.props.navigation.goBack();
       })
-      .catch(error => {
+      .catch(() => {
         // An error happened.
         Alert.alert("Error", "Incorrect password.", [
           { text: "Retry" },
